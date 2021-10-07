@@ -83,6 +83,34 @@ module.exports = {
       checkout_session: session.id
     });
 
-    return { id: session.id}
+    return {id: session.id}
+  },
+  /**
+   * Given a checkout session verifies payment and update the order.
+   * @param ctx
+   * @returns {Promise<*|{}>}
+   */
+  async confirm(ctx) {
+    const {checkout_session} = ctx.request.body
+    console.log("checkout_session", checkout_session)
+    const session = await stripe.checkout.sessions.retrieve(
+      checkout_session
+    )
+    console.log("verify session", session)
+
+    if (session.payment_status === "paid") {
+      //Update order
+      const newOrder = await strapi.services.order.update({
+          checkout_session
+        },
+        {
+          status: 'paid'
+        })
+
+      return newOrder
+
+    } else {
+      ctx.throw(400, "It seems like the order wasn't verified, please contact support")
+    }
   }
 };

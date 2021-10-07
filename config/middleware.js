@@ -1,5 +1,10 @@
 module.exports = () => ({
   settings: {
-    cors: {enabled: true, headers: '*'}
+    cors: {
+      enabled: true,
+      headers: '*',
+      origin: '*',
+      method: '*'
+    }
   }
 })
